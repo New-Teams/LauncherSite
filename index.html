@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewSMP Launcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #2a0a2f 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .scroll-container {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        section {
+            min-height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* Hero Section */
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .highlight {
+            color: #ff69b4;
+            text-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: white;
+            box-shadow: 0 8px 24px rgba(255, 105, 180, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(255, 105, 180, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 105, 180, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 105, 180, 0.2);
+            border-color: #ff69b4;
+        }
+
+        .version-badge {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 16px;
+            background: rgba(255, 105, 180, 0.15);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #ffc0cb;
+        }
+
+        .launcher-preview {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .launcher-preview img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 50px;
+            border: 2px solid rgba(255, 105, 180, 0.4);
+            border-radius: 20px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 8px;
+        }
+
+        .scroll-dot {
+            width: 6px;
+            height: 6px;
+            background: #ff69b4;
+            border-radius: 50%;
+            animation: scrollDot 2s infinite;
+        }
+
+        @keyframes scrollDot {
+            0% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(16px); opacity: 0.5; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Features Section */
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 105, 180, 0.1);
+            border-color: #ff69b4;
+            box-shadow: 0 12px 32px rgba(255, 105, 180, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: #ff69b4;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: #d0d0d0;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            color: #c0c0c0;
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 0.95rem;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+
+        /* Comparison Table */
+        .table-wrapper {
+            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 105, 180, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(255, 105, 180, 0.15);
+        }
+
+        th, td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.1);
+        }
+
+        th {
+            color: #ff69b4;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(255, 105, 180, 0.05);
+        }
+
+        /* Download Section */
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+        }
+
+        .download-card {
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.1) 0%, rgba(255, 20, 147, 0.05) 100%);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .download-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(255, 105, 180, 0.3);
+        }
+
+        .download-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .download-card h3 {
+            font-size: 1.5rem;
+        }
+
+        .platform-icon {
+            font-size: 2rem;
+        }
+
+        .download-info {
+            color: #c0c0c0;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .download-size {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 105, 180, 0.2);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .hash-details {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            word-break: break-all;
+        }
+
+        .hash-details summary {
+            cursor: pointer;
+            color: #ff69b4;
+            margin-bottom: 8px;
+        }
+
+        /* Content Section */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .content-text h4 {
+            color: #ff69b4;
+            font-size: 1.3rem;
+            margin: 24px 0 12px;
+        }
+
+        .content-text p {
+            color: #d0d0d0;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .content-text ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .content-text ul li {
+            color: #c0c0c0;
+            padding: 10px 0;
+            padding-left: 28px;
+            position: relative;
+        }
+
+        .content-text ul li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #ff69b4;
+        }
+
+        .security-image {
+    text-align: center;
+    background: rgba(255, 105, 180, 0.05);
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 105, 180, 0.2);
+
+    /* Ajout pour que le conteneur suive l'image */
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.security-image img {
+    width: 150%;
+    max-width: none; /* important pour éviter que 150% soit annulé */
+    border-radius: 12px;
+    display: block;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+
+
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-grid,
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            section {
+                padding: 60px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-container">
+        <!-- Hero Section -->
+        <section id="home">
+            <div class="container">
+                <div class="hero-grid">
+                    <div>
+                        <h1 class="fade-in delay-1">
+                            NewSMP <span class="highlight">Launcher</span>
+                        </h1>
+                        <p class="subtitle fade-in delay-2">
+                            Une plateforme moderne et élégante pour lancer votre aventure Minecraft. 
+                            Installez, mettez à jour et rejoignez la communauté en toute simplicité.
+                        </p>
+                        <div class="btn-group fade-in delay-3">
+                            <a href="#download" class="btn btn-primary">
+                                <span>⬇</span> Télécharger maintenant
+                            </a>
+                            <a href="#features" class="btn btn-secondary">
+                                <span>ℹ</span> En savoir plus
+                            </a>
+                        </div>
+                        <div class="version-badge fade-in delay-4">
+                            Version actuelle: <strong>v1.1.2</strong> • Publié le 21/11/2024
+                        </div>
+                    </div>
+                    <div class="launcher-preview fade-in delay-3">
+                        <img src="https://raw.githubusercontent.com/New-Teams/assets/refs/heads/main/launcher.png" alt="Aperçu du launcher">
+                    </div>
+                </div>
+                <div class="scroll-indicator">
+                    <div class="scroll-dot"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <div class="container">
+                <h2 class="fade-in">À propos du launcher</h2>
+                <div class="content-grid">
+                    <div class="content-text">
+                        <p class="fade-in delay-1">
+                            Le NewSMP Launcher est conçu pour offrir une expérience de jeu optimale 
+                            sur nos serveurs Minecraft. Gérez facilement les mods autorisés, vos profils et vos 
+                            configurations en un seul endroit.
+                        </p>
+                        
+                        <h4 class="fade-in delay-2">Points clés</h4>
+                        <ul class="fade-in delay-2">
+                            <li>Restauration rapide vers une version précédente en cas de problème</li>
+                            <li>Vérification d'intégrité SHA-512 pour tous les fichiers</li>
+                            <li>Gestion avancée des mods et des profils personnalisés</li>
+                            <li>Connexion directe aux serveurs NewSMP</li>
+                        </ul>
+
+                        <h4 class="fade-in delay-3">Sécurité et performance</h4>
+                        <p class="fade-in delay-3">
+                            Toutes les communications sont cryptées via HTTPS. Le launcher utilise des 
+                            mises à jour différentielles pour réduire les temps de téléchargement et 
+                            vérifie automatiquement l'intégrité des fichiers installés.
+                        </p>
+
+                        <h4 class="fade-in delay-4">Vie privée</h4>
+                        <p class="fade-in delay-4">
+                            Nous ne collectons que des données anonymes pour améliorer le service. 
+                            Aucune information de jeu personnelle n'est transmise sans votre consentement.
+                        </p>
+                    </div>
+                    <div class="security-image fade-in delay-2">
+                        <img src="https://raw.githubusercontent.com/New-Teams/assets/refs/heads/main/launcher.png" alt="Sécurité">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features">
+            <div class="container">
+                <h2 class="fade-in">Fonctionnalités principales</h2>
+                <div class="features-grid">
+                    <div class="feature-card fade-in delay-1">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Ultra-rapide</h3>
+                        <p>Lancement instantané et mises à jour optimisées grâce au système de patching différentiel.</p>
+                        <ul class="feature-list">
+                            <li>Démarrage hyper rapide</li>
+                            <li>Mises à jour incrémentielles intelligentes</li>
+                            <li>Cache optimisé pour réduire les téléchargements</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card fade-in delay-2">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Sécurisé</h3>
+                        <p>Protection maximale avec vérification d'intégrité et chiffrement de bout en bout.</p>
+                        <ul class="feature-list">
+                            <li>Vérification SHA-512 de tous les fichiers</li>
+                            <li>Réparation automatique des fichiers corrompus</li>
+                            <li>Communications cryptées HTTPS</li>
+                            <li>Testé sur VirusTotal</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card fade-in delay-3">
+                        <div class="feature-icon">🎮</div>
+                        <h3>Communautaire</h3>
+                        <p>Restez connecté avec la communauté NewSMP via des fonctionnalités intégrées.</p>
+                        <ul class="feature-list">
+                            <li>Intégration Discord native</li>
+                            <li>Profils multiples et partage de configurations</li>
+                            <li>Accès direct aux serveurs officiels</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Section -->
+        <section id="comparison">
+            <div class="container">
+                <h2 class="fade-in">Comparaison avec d'autres launchers</h2>
+                <div class="table-wrapper fade-in delay-1">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fonctionnalité</th>
+                                <th>NewSMP Launcher</th>
+                                <th>MultiMC</th>
+                                <th>GDLauncher</th>
+                                <th>ATLauncher</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Interface moderne</td>
+                                <td>✓ Design personnalisé</td>
+                                <td>Interface classique</td>
+                                <td>✓ Moderne</td>
+                                <td>Interface basique</td>
+                            </tr>
+                            <tr>
+                                <td>Mises à jour auto</td>
+                                <td>✓ Optimisées</td>
+                                <td>Manuelles</td>
+                                <td>Partielles</td>
+                                <td>Non</td>
+                            </tr>
+                            <tr>
+                                <td>Support serveurs</td>
+                                <td>✓ Intégration native</td>
+                                <td>Configuration manuelle</td>
+                                <td>Limitée</td>
+                                <td>Basique</td>
+                            </tr>
+                            <tr>
+                                <td>Gestion Java</td>
+                                <td>✓ Automatique</td>
+                                <td>✓ Configurable</td>
+                                <td>✓ Automatique</td>
+                                <td>Manuelle</td>
+                            </tr>
+                            <tr>
+                                <td>Support communauté</td>
+                                <td>✓ Discord intégré</td>
+                                <td>Forums externes</td>
+                                <td>Limité</td>
+                                <td>Forums externes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Download Section -->
+        <section id="download">
+            <div class="container">
+                <h2 class="fade-in">Téléchargements</h2>
+                <p style="text-align: center; color: #d0d0d0; margin-bottom: 40px;" class="fade-in delay-1">
+                    Choisissez votre plateforme pour télécharger la dernière version
+                </p>
+                <div class="download-grid">
+                    <div class="download-card fade-in delay-1">
+                        <div class="download-header">
+                            <div>
+                                <h3>Windows</h3>
+                                <div class="download-info">Installateur exécutable</div>
+                            </div>
+                            <div class="platform-icon">🪟</div>
+                        </div>
+                        <div class="download-size">80.6 MO</div>
+                        <a href="https://github.com/New-Teams/NewLauncher/releases/download/v1.1.2/NewSMP-1.1.2.exe" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                            Télécharger v1.1.2
+                        </a>
+                        <details class="hash-details">
+                            <summary>Afficher le hash SHA-512</summary>
+                            <div style="margin-top: 8px;">BDB5F75A3910497E86541ED5CEC637138F61F53E5DA85F4DC24AD0BC5947B538BA94655E9506FB083B416CAD15288C1460A3E36F8BE67D41E351263501A672BF</div>
+                        </details>
+                    </div>
+                    <!--
+                    <div class="download-card fade-in delay-2">
+                        <div class="download-header">
+                            <div>
+                                <h3>macOS</h3>
+                                <div class="download-info">Image disque DMG</div>
+                            </div>
+                            <div class="platform-icon">🍎</div>
+                        </div>
+                        <div class="download-size">none</div>
+                        <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                            Non disponible
+                        </a>
+                        <details class="hash-details">
+                            <summary>Afficher le hash SHA-512</summary>
+                            <div style="margin-top: 8px;">Empty</div>
+                        </details>
+                    </div>
+                    -->
+                    <div class="download-card fade-in delay-3">
+                        <div class="download-header">
+                            <div>
+                                <h3>Linux</h3>
+                                <div class="download-info">AppImage portable</div>
+                            </div>
+                            <div class="platform-icon">🐧</div>
+                        </div>
+                        <div class="download-size">none</div>
+                        <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                            En developpement
+                        </a>
+                        <details class="hash-details">
+                            <summary>Afficher le hash SHA-512</summary>
+                            <div style="margin-top: 8px;">Empty</div>
+                        </details>
+                    </div>
+                
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Smooth scroll animation on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                el.style.animationPlayState = 'paused';
+                observer.observe(el);
+            });
+
+            // Smooth scroll for links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
